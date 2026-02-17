@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleDevelopmentRegion</key>
+    <string>en</string>
+    <key>CFBundleDocumentTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleTypeRole</key>
+            <string>QLGenerator</string>
+            <key>LSItemContentTypes</key>
+            <array>
+                <string>public.data</string>
+            </array>
+        </dict>
+    </array>
+    <key>CFBundleExecutable</key>
+    <string>nrrd_ql_wrapper</string>
+    <key>CFBundleIdentifier</key>
+    <string>com.nrrd.quicklook</string>
+    <key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
+    <key>CFBundleName</key>
+    <string>NRRD Preview</string>
+    <key>CFBundlePackageType</key>
+    <string>BNDL</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0</string>
+    <key>CFBundleVersion</key>
+    <string>1</string>
+    <key>QLNeedsToBeRunInMainThread</key>
+    <false/>
+    <key>QLPreviewHeight</key>
+    <real>600</real>
+    <key>QLPreviewWidth</key>
+    <real>800</real>
+    <key>QLSupportsConcurrentRequests</key>
+    <true/>
+    <key>QLThumbnailMinimumSize</key>
+    <real>128</real>
+    <key>UTImportedTypeDeclarations</key>
+    <array>
+        <dict>
+            <key>UTTypeConformsTo</key>
+            <array>
+                <string>public.data</string>
+            </array>
+            <key>UTTypeDescription</key>
+            <string>NRRD Volume File</string>
+            <key>UTTypeIdentifier</key>
+            <string>org.teem.nrrd</string>
+            <key>UTTypeTagSpecification</key>
+            <dict>
+                <key>public.filename-extension</key>
+                <array>
+                    <string>nrrd</string>
+                    <string>nhdr</string>
+                </array>
+            </dict>
+        </dict>
+    </array>
+</dict>
+</plist>
