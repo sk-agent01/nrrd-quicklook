@@ -118,6 +118,11 @@ struct ContentView: View {
                     nrrdInfo = info
                     errorMessage = nil
                 }
+            } catch let error as NRRDError {
+                DispatchQueue.main.async {
+                    errorMessage = error.errorDescription ?? "Unknown NRRD error"
+                    previewImage = nil
+                }
             } catch {
                 DispatchQueue.main.async {
                     errorMessage = "Error: \(error.localizedDescription)"
