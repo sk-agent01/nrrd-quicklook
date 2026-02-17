@@ -25,6 +25,7 @@ targets:
     postBuildScripts:
       - name: Copy Python Script
         script: |
+          mkdir -p "${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/Contents/Resources/"
           cp "${PROJECT_DIR}/../nrrd_preview.py" "${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/Contents/Resources/"
 
   PreviewExtension:
