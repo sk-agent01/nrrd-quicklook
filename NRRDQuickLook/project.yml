@@ -1,0 +1,39 @@
+name: NRRDQuickLook
+options:
+  bundleIdPrefix: com.nrrd
+  deploymentTarget:
+    macOS: "12.0"
+
+settings:
+  DEVELOPMENT_TEAM: ""
+  CODE_SIGN_IDENTITY: "-"
+  CODE_SIGN_STYLE: Manual
+
+targets:
+  NRRDQuickLook:
+    type: application
+    platform: macOS
+    sources:
+      - NRRDQuickLook
+    settings:
+      INFOPLIST_FILE: NRRDQuickLook/Info.plist
+      PRODUCT_BUNDLE_IDENTIFIER: com.nrrd.quicklook
+      MACOSX_DEPLOYMENT_TARGET: "12.0"
+    dependencies:
+      - target: PreviewExtension
+    postBuildScripts:
+      - name: Copy Python Script
+        script: |
+          cp "${PROJECT_DIR}/../nrrd_preview.py" "${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/Contents/Resources/"
+
+  PreviewExtension:
+    type: app-extension
+    platform: macOS
+    sources:
+      - PreviewExtension
+    settings:
+      INFOPLIST_FILE: PreviewExtension/Info.plist
+      PRODUCT_BUNDLE_IDENTIFIER: com.nrrd.quicklook.preview
+      SKIP_INSTALL: "YES"
+      LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/../Frameworks @executable_path/../../../../Frameworks"
+    dependencies: []
