@@ -32,37 +32,25 @@ jobs:
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO
       
-      - name: Create release bundle
+      - name: Create DMG
         run: |
-          mkdir -p release
-          cp -R NRRDQuickLook/build/Build/Products/Release/NRRDQuickLook.app release/
+          mkdir -p dmg-contents
+          cp -R NRRDQuickLook/build/Build/Products/Release/NRRDQuickLook.app dmg-contents/
+          ln -s /Applications dmg-contents/Applications
           
-          # Create README
-          cat > release/README.txt << 'EOF'
-          NRRD QuickLook
-          ==============
-          
-          A macOS Quick Look plugin for previewing .nrrd files.
-          
-          Installation:
-          1. Move NRRDQuickLook.app to /Applications
-          2. Open the app once to register the extension
-          3. Go to System Settings → Extensions → Quick Look
-          4. Enable NRRDQuickLook
-          
-          No Python or other dependencies required - fully self-contained.
-          EOF
-          
-          cd release && zip -r ../NRRDQuickLook-macos.zip .
+          hdiutil create -volname "NRRDQuickLook" \
+            -srcfolder dmg-contents \
+            -ov -format UDZO \
+            NRRDQuickLook.dmg
       
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: NRRDQuickLook-macos
-          path: NRRDQuickLook-macos.zip
+          name: NRRDQuickLook
+          path: NRRDQuickLook.dmg
       
       - name: Release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v1
         with:
-          files: NRRDQuickLook-macos.zip
+          files: NRRDQuickLook.dmg
