@@ -1,0 +1,66 @@
+name: Build macOS App
+
+on:
+  push:
+    branches: [master, main]
+    tags: ['v*']
+  pull_request:
+    branches: [master, main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-14
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install xcodegen
+        run: brew install xcodegen
+      
+      - name: Generate Xcode project
+        working-directory: NRRDQuickLook
+        run: xcodegen generate
+      
+      - name: Build app
+        working-directory: NRRDQuickLook
+        run: |
+          xcodebuild -scheme NRRDQuickLook \
+            -configuration Release \
+            -derivedDataPath build \
+            CODE_SIGN_IDENTITY="-" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
+      
+      - name: Create release bundle
+        run: |
+          mkdir -p release
+          cp -R NRRDQuickLook/build/Build/Products/Release/NRRDQuickLook.app release/
+          cp nrrd_preview.py release/NRRDQuickLook.app/Contents/Resources/
+          cp requirements.txt release/
+          
+          # Create install script
+          cat > release/install.sh << 'EOF'
+          #!/bin/bash
+          set -e
+          echo "Installing NRRD Quick Look..."
+          pip3 install --user pynrrd matplotlib numpy
+          cp -R NRRDQuickLook.app /Applications/
+          open /Applications/NRRDQuickLook.app
+          echo "Done! Enable extension in System Settings → Extensions → Quick Look"
+          EOF
+          chmod +x release/install.sh
+          
+          cd release && zip -r ../NRRDQuickLook-macos.zip .
+      
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: NRRDQuickLook-macos
+          path: NRRDQuickLook-macos.zip
+      
+      - name: Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: NRRDQuickLook-macos.zip
