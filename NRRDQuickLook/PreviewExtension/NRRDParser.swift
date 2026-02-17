@@ -1,6 +1,5 @@
 import Foundation
 import Compression
-import zlib
 
 /// NRRD file parser - reads header and decompresses data
 struct NRRDFile {
@@ -109,39 +108,65 @@ class NRRDParser {
     }
     
     private static func decompressGzip(_ compressed: Data) throws -> Data {
-        // Use zlib to decompress
-        var decompressed = Data()
-        let bufferSize = 65536
-        var buffer = [UInt8](repeating: 0, count: bufferSize)
+        // Skip gzip header if present (10 bytes minimum)
+        var offset = 0
+        if compressed.count > 10 && compressed[0] == 0x1f && compressed[1] == 0x8b {
+            // Gzip magic bytes found, skip header
+            let flags = compressed[3]
+            offset = 10
+            
+            // Skip extra field if present
+            if flags & 0x04 != 0 && offset + 2 <= compressed.count {
+                let extraLen = Int(compressed[offset]) | (Int(compressed[offset + 1]) << 8)
+                offset += 2 + extraLen
+            }
+            
+            // Skip original filename if present
+            if flags & 0x08 != 0 {
+                while offset < compressed.count && compressed[offset] != 0 {
+                    offset += 1
+                }
+                offset += 1 // skip null terminator
+            }
+            
+            // Skip comment if present
+            if flags & 0x10 != 0 {
+                while offset < compressed.count && compressed[offset] != 0 {
+                    offset += 1
+                }
+                offset += 1
+            }
+            
+            // Skip header CRC if present
+            if flags & 0x02 != 0 {
+                offset += 2
+            }
+        }
         
-        var stream = z_stream()
-        stream.next_in = UnsafeMutablePointer<Bytef>(mutating: (compressed as NSData).bytes.bindMemory(to: Bytef.self, capacity: compressed.count))
-        stream.avail_in = uInt(compressed.count)
+        // Strip gzip trailer (8 bytes: CRC32 + original size)
+        let deflateData = compressed.subdata(in: offset..<(compressed.count - 8))
         
-        // Use inflateInit2 with 15+32 to auto-detect gzip/zlib
-        guard inflateInit2_(&stream, 15 + 32, ZLIB_VERSION, Int32(MemoryLayout<z_stream>.size)) == Z_OK else {
+        // Use Compression framework to decompress raw DEFLATE data
+        let bufferSize = deflateData.count * 10  // Estimate
+        var destinationBuffer = [UInt8](repeating: 0, count: bufferSize)
+        
+        let decompressedSize = deflateData.withUnsafeBytes { sourcePtr -> Int in
+            let sourceBytes = sourcePtr.bindMemory(to: UInt8.self)
+            return compression_decode_buffer(
+                &destinationBuffer,
+                bufferSize,
+                sourceBytes.baseAddress!,
+                deflateData.count,
+                nil,
+                COMPRESSION_ZLIB
+            )
+        }
+        
+        guard decompressedSize > 0 else {
             throw NRRDError.decompressionFailed
         }
         
-        defer { inflateEnd(&stream) }
-        
-        repeat {
-            stream.next_out = &buffer
-            stream.avail_out = uInt(bufferSize)
-            
-            let status = inflate(&stream, Z_NO_FLUSH)
-            
-            guard status == Z_OK || status == Z_STREAM_END else {
-                throw NRRDError.decompressionFailed
-            }
-            
-            let outputCount = bufferSize - Int(stream.avail_out)
-            decompressed.append(buffer, count: outputCount)
-            
-            if status == Z_STREAM_END { break }
-        } while stream.avail_out == 0
-        
-        return decompressed
+        return Data(destinationBuffer.prefix(decompressedSize))
     }
     
     private static func convertToFloat(_ data: Data, type: String, count: Int) throws -> [Float] {

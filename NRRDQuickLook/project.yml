@@ -33,6 +33,4 @@ targets:
       PRODUCT_BUNDLE_IDENTIFIER: com.nrrd.quicklook.preview
       SKIP_INSTALL: "YES"
       LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/../Frameworks @executable_path/../../../../Frameworks"
-      OTHER_LDFLAGS: "-lz"
-    dependencies:
-      - sdk: libz.tbd
+    dependencies: []
