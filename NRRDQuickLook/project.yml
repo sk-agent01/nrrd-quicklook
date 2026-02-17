@@ -16,6 +16,7 @@ targets:
     platform: macOS
     sources:
       - NRRDQuickLook
+      - Shared
     settings:
       INFOPLIST_FILE: NRRDQuickLook/Info.plist
       PRODUCT_BUNDLE_IDENTIFIER: com.nrrd.quicklook
@@ -28,6 +29,7 @@ targets:
     platform: macOS
     sources:
       - PreviewExtension
+      - Shared
     settings:
       INFOPLIST_FILE: PreviewExtension/Info.plist
       PRODUCT_BUNDLE_IDENTIFIER: com.nrrd.quicklook.preview
