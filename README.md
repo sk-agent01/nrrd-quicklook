@@ -1,94 +1,41 @@
-# NRRD Quick Look for macOS
+# NRRD QuickLook
 
-Press **spacebar** on .nrrd files in Finder to preview 3D masks with colored labels.
+A macOS Quick Look extension for previewing [NRRD](http://teem.sourceforge.net/nrrd/format.html) (Nearly Raw Raster Data) files directly in Finder.
 
-![Preview example](preview.jpg)
+![Preview](preview.png)
 
 ## Features
 
-- Native macOS Quick Look integration (spacebar preview)
-- Renders 3D masks with distinct colors per label
-- Shows axial, coronal, and sagittal views
-- Displays shape info and legend
+- 🔍 Native Quick Look integration - press Space in Finder to preview
+- 🎨 Colored labels for segmentation masks
+- 📊 Grayscale rendering for continuous data
+- 🖼️ Multi-view display: axial, coronal, and sagittal slices
+- ⚡ Self-contained - no Python or external dependencies
+
+## Supported Formats
+
+- Raw and gzip-compressed NRRD files
+- Data types: uint8, int8, uint16, int16, uint32, int32, float32, float64
+- 2D and 3D volumes
 
 ## Installation
 
-### Prerequisites
+1. Download `NRRDQuickLook-macos.zip` from [Releases](../../releases)
+2. Unzip and move `NRRDQuickLook.app` to `/Applications`
+3. Open the app once (it will close immediately - this registers the extension)
+4. Go to **System Settings → Extensions → Quick Look**
+5. Enable **NRRDQuickLook**
 
-```bash
-# Install Python dependencies
-pip3 install pynrrd matplotlib numpy
+## Building from Source
 
-# Install xcodegen (for building the Xcode project)
-brew install xcodegen
-```
-
-### Build the App
+Requires Xcode 15+ and [XcodeGen](https://github.com/yonaskolb/XcodeGen).
 
 ```bash
 cd NRRDQuickLook
-
-# Generate Xcode project
 xcodegen generate
-
-# Open in Xcode
-open NRRDQuickLook.xcodeproj
-
-# Build: Product → Build (Cmd+B)
-# Or from command line:
 xcodebuild -scheme NRRDQuickLook -configuration Release
 ```
 
-### Install
+## License
 
-1. Copy `NRRDQuickLook.app` to `/Applications/`
-2. Launch it once to register the Quick Look extension
-3. Go to **System Settings → Privacy & Security → Extensions → Quick Look**
-4. Enable "NRRD Preview"
-
-### Test
-
-```bash
-# Reset Quick Look
-qlmanage -r
-qlmanage -r cache
-
-# Test preview
-qlmanage -p /path/to/your/file.nrrd
-```
-
-Or just press **spacebar** on a .nrrd file in Finder!
-
-## Standalone CLI Usage
-
-You can also use the Python script directly:
-
-```bash
-python3 nrrd_preview.py input.nrrd -o preview.jpg
-```
-
-## Troubleshooting
-
-### Preview not working?
-
-1. Make sure Python dependencies are installed: `pip3 list | grep pynrrd`
-2. Check extension is enabled in System Settings
-3. Try: `qlmanage -r && qlmanage -r cache`
-4. Reboot if needed
-
-### "Python not found" error?
-
-The extension looks for `python3` in standard locations. Make sure it's in your PATH.
-
-## How It Works
-
-1. Quick Look extension receives the .nrrd file path
-2. Calls Python script to render preview
-3. Returns JPEG image to Quick Look
-
-## Uninstall
-
-```bash
-rm -rf /Applications/NRRDQuickLook.app
-qlmanage -r
-```
+MIT

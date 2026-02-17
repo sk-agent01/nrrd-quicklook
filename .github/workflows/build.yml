@@ -36,20 +36,22 @@ jobs:
         run: |
           mkdir -p release
           cp -R NRRDQuickLook/build/Build/Products/Release/NRRDQuickLook.app release/
-          cp nrrd_preview.py release/NRRDQuickLook.app/Contents/Resources/
-          cp requirements.txt release/
           
-          # Create install script
-          cat > release/install.sh << 'EOF'
-          #!/bin/bash
-          set -e
-          echo "Installing NRRD Quick Look..."
-          pip3 install --user pynrrd matplotlib numpy
-          cp -R NRRDQuickLook.app /Applications/
-          open /Applications/NRRDQuickLook.app
-          echo "Done! Enable extension in System Settings → Extensions → Quick Look"
+          # Create README
+          cat > release/README.txt << 'EOF'
+          NRRD QuickLook
+          ==============
+          
+          A macOS Quick Look plugin for previewing .nrrd files.
+          
+          Installation:
+          1. Move NRRDQuickLook.app to /Applications
+          2. Open the app once to register the extension
+          3. Go to System Settings → Extensions → Quick Look
+          4. Enable NRRDQuickLook
+          
+          No Python or other dependencies required - fully self-contained.
           EOF
-          chmod +x release/install.sh
           
           cd release && zip -r ../NRRDQuickLook-macos.zip .
       
