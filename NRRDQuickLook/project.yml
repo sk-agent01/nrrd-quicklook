@@ -3,6 +3,7 @@ options:
   bundleIdPrefix: com.nrrd
   deploymentTarget:
     macOS: "12.0"
+  xcodeVersion: "15.0"
 
 settings:
   DEVELOPMENT_TEAM: ""
